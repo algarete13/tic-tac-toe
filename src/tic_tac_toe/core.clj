@@ -1,5 +1,6 @@
 (ns tic-tac-toe.core
-  (:require [clojure.set :as set]))
+  (:require [clojure.set :as set]
+	    [clojure.contrib.def :as cc-def]))
 
 
 (def all-moves (range 9))
@@ -82,7 +83,7 @@
   (let [scores (map score-fn keys)]
       (reduce max scores)))    
 
-(defn expected-result [board player]
+(cc-def/defn-memo expected-result [board player]
   (let [winner (who-won board)]
     (cond (not (= 0 winner)) winner
 	  (is-board-full board) 0
