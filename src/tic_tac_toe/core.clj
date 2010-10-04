@@ -1,7 +1,8 @@
 (ns tic-tac-toe.core
   (:require [clojure.set :as set]
-	    [clojure.contrib.def :as cc-def]))
-
+	    [clojure.contrib.def :as cc-def])
+  (:use compojure.core, ring.adapter.jetty, hiccup.core)
+  (:require [compojure.route :as route]))
 
 (def all-moves (range 9))
 
@@ -99,3 +100,16 @@
 				    (board-after-move board move player)
 				      (* -1 player)))) 
 	    (possible-moves board)))
+
+;This is where our game begins to be displayed
+(defn index-view 
+  (html [:h1 "Tic Tac Toe"]))
+
+
+(defroutes main-routes
+  (GET "/" [] (index-view))
+  (route/not-found "<h1>Page not found</h1>"))
+
+; lein run tic-tac-toe.core run-server
+(defn run-server []
+  (run-jetty main-routes {:port 8080})
