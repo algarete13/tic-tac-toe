@@ -23,20 +23,21 @@
 			    7
 			    1))
       "board-after-move broken"))
- (def reasonable-moves-board [1 0 -1
-                                           0 1 0
-                                           0 -1 0])
+
+(def reasonable-moves-board [1 0 -1
+			     0 1 0
+			     0 -1 0])
 					   
 (deftest remaining-combinations-test
-  (is (= #{}
-         (remaining-combinations reasonable-moves-board
-					  1)))
-  (is (= #{#{3 4 5} #{2 5 8}}
-         (remaining-combinations reasonable-moves-board
-					  5)))
-  (is (= #{#{2 5 8} #{0 4 8} #{6 7 8}}
-          (remaining-combinations reasonable-moves-board
-					   8))))
+	 (is (= #{#{3 4 5} #{6 7 8} #{0 3 6} #{2 5 8} #{0 4 8}}
+		(remaining-combinations reasonable-moves-board))))
+
+(deftest one-move-from-win-test
+  (is (= #{4 6}
+	 (one-move-from-win [0 0 0
+			     1 0 1
+			     0 -1 -1]))
+      "There are two spots that lead to an immediate win"))
 
 (deftest test-is-board-full
   (is (= true (is-board-full [1 1 1 1 1 1 1 1 1]))

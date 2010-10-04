@@ -1,4 +1,6 @@
-(ns tic-tac-toe.core)
+(ns tic-tac-toe.core
+  (:require [clojure.set :as set]))
+
 
 (def all-moves (range 9))
 
@@ -18,19 +20,35 @@
       #{6 7 8} #{0 3 6} 
       #{1 4 7} #{2 5 8} 
       #{0 4 8} #{2 4 6}])
-
-(defn remaining-combinations [board move]
+ 
+(defn remaining-combinations [board]
   (set (filter (fn [combo]
-		    (and (contains? combo move)
-		           (not (let [contents
-		                           (set (map (fn [move]
-				                              (nth board move))
-					                  combo))]
-			              (and (contains? contents 1)
-			                     (contains? contents -1))))))
-                 winning-combinations)))
+		 (not (let [contents
+			    (set (map (fn [move]
+					(nth board move))
+				      combo))]
+			(and (contains? contents 1)
+			     (contains? contents -1)))))
+	       winning-combinations)))
+
+(defn one-move-from-win [board]
+  (let [remaining-combinations (remaining-combinations board)
+	one-space-remaining (filter (fn [combo]
+				      (= 1
+					 (count (filter (fn [move]
+							  (is-move-possible board move))
+							combo))))
+				    remaining-combinations)]
+    (set (filter (fn [move]
+		   (is-move-possible board move))
+		 (apply set/union one-space-remaining)))))
+
+	    
+
+;(defn combo-value [board
+
 ;(defn reasonable-moves [possible-moves]
-; (cond
+;  (let [
 
 (defn is-board-full [board]
   (empty? (possible-moves board)))
@@ -62,24 +80,21 @@
 
 (defn max-value [score-fn & keys]
   (let [scores (map score-fn keys)]
-      (reduce max scores)))
-
-
-    
+      (reduce max scores)))    
 
 (defn expected-result [board player]
   (let [winner (who-won board)]
     (cond (not (= 0 winner)) winner
 	  (is-board-full board) 0
 	  true (apply max-value (fn [move] (* player
-	                           (expected-result 
-				      (board-after-move board move player)
-				      (* -1 player)))) 
-				(possible-moves board)))))
+					      (expected-result 
+					       (board-after-move board move player)
+					       (* -1 player)))) 
+		      (possible-moves board)))))
 				
 (defn best-move [board player]
   (max-key2 (fn [move](* player
-	                           (expected-result 
-				      (board-after-move board move player)
+			 (expected-result 
+				    (board-after-move board move player)
 				      (* -1 player)))) 
-				(possible-moves board)))
+	    (possible-moves board)))
